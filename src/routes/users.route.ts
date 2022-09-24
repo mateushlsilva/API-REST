@@ -2,9 +2,11 @@ import { Router, Request, Response, NextFunction } from "express";
 import { StatusCodes } from 'http-status-codes';
 
 const usersRoute = Router();
+const users = require('../models/userTable')
 
 usersRoute.get('/users', (req: Request, res: Response, next: NextFunction)=>{
     const users = [{ userName: 'Mateus'}]
+    res.send(users)
     res.status(StatusCodes.OK).send(users)
 })
 

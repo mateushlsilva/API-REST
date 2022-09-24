@@ -1,17 +1,16 @@
-import { createConnection } from 'mysql2';
+import { Sequelize } from 'sequelize'
 
 
-const connection = createConnection({
+const connection = new Sequelize("pessoas", "root", "fatec", {
     host: 'localhost',
-    port: 3306,
-    user: 'root',
-    password: 'fatecsjc',
-    database: 'pessoas'
+    dialect: 'mysql'
 })
 
-connection.connect((err)=>{
-    if(err) return console.log(err);
-    console.log("conectou");
+connection.authenticate()
+.then(function(){
+    console.log("Conexão com banco de dados realizada com sucesso!");
+}).catch(function(){
+    console.log("Erro: Conexão com banco de dados");
 })
 
-export default connection;
+module.exports = connection;
