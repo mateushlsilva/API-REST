@@ -1,7 +1,6 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { StatusCodes } from 'http-status-codes';
-import { QueryTypes } from 'sequelize';
-//const {  QueryTypes  } = require("sequelize");
+
 
 const usersRoute = Router();
 const users = require('../models/userTable')
@@ -13,8 +12,6 @@ usersRoute.get('/users', async(req: Request, res: Response, next: NextFunction)=
 
 usersRoute.get('/users/:uuid', async(req: Request<{ uuid: string }>, res: Response, next: NextFunction)=>{
     const uuid = req.params.uuid;
-    console.log("Tri");
-    
     const project = await users.findOne({ where: { id: uuid } })
     
     if (project === null) {
@@ -24,8 +21,7 @@ usersRoute.get('/users/:uuid', async(req: Request<{ uuid: string }>, res: Respon
         })
     } else {
         return res.json(project)
- }
-    
+    }
 })
 
 usersRoute.post('/users', async (req: Request, res: Response, next: NextFunction)=>{
@@ -53,17 +49,17 @@ usersRoute.put('/users/:uuid', async(req: Request<{ uuid: string }>, res: Respon
             id: uuid
           }
     })
-    .then(() =>{
-        return res.json({
-            erro: false,
-            mensagem: "Usuario atualizado com sucesso!"
+     .then(() =>{
+         return res.json({
+             erro: false,
+             mensagem: "Usuario atualizado com sucesso!"
+         })
+     }).catch(() =>{
+         return res.status(StatusCodes.NOT_FOUND).json({
+             erro: true,
+             mensagem: "Usuario não atualizado!"
         })
-    }).catch(() =>{
-        return res.status(StatusCodes.NOT_FOUND).json({
-            erro: true,
-            mensagem: "Usuario não atualizado!"
-        })
-    })
+     })
 })
 
 
