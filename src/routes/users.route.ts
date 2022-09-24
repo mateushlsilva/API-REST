@@ -1,24 +1,31 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { StatusCodes } from 'http-status-codes';
-import { Sequelize } from 'sequelize';
+import { QueryTypes } from 'sequelize';
+//const {  QueryTypes  } = require("sequelize");
 
 const usersRoute = Router();
 const users = require('../models/userTable')
 
-usersRoute.get('/users', (req: Request, res: Response, next: NextFunction)=>{
-    const users = [{ userName: 'Mateus'}]
-    res.send(users)
-    res.status(StatusCodes.OK).send(users)
+usersRoute.get('/users', async(req: Request, res: Response, next: NextFunction)=>{
+    const usersList = await users.findAll();
+    res.status(StatusCodes.OK).send(usersList)
 })
 
-usersRoute.get('/users/:uuid', (req: Request<{ uuid: string }>, res: Response, next: NextFunction)=>{
+usersRoute.get('/users/:uuid', async(req: Request<{ uuid: string }>, res: Response, next: NextFunction)=>{
     const uuid = req.params.uuid;
-    res.status(StatusCodes.OK).send({ uuid });
+    const project = await users.findOne({ where: { id: uuid } });
+    if (project === null) {
+        console.log('Not found!');
+    } else {
+    console.log(project instanceof users); // true
+    console.log(project.id); // 'My Title'
+}
+    
 })
 
 usersRoute.post('/users', async (req: Request, res: Response, next: NextFunction)=>{
-    console.log(req.body);
-    await users.create(req.body)
+    const newUser = req.body
+    await users.create(newUser)
     .then(() =>{
         return res.json({
             erro: false,
@@ -27,24 +34,52 @@ usersRoute.post('/users', async (req: Request, res: Response, next: NextFunction
     }).catch(() =>{
         return res.status(StatusCodes.NOT_FOUND).json({
             erro: true,
-            mensagem: "Usuario não cadastrado com sucesso!"
+            mensagem: "Usuario não cadastrado!"
         })
     })
-    res.status(StatusCodes.CREATED).send(req.body)
-    
 })
 
-usersRoute.put('/users/:uuid', (req: Request<{ uuid: string }>, res: Response, next: NextFunction)=>{
+usersRoute.put('/users/:uuid', async(req: Request<{ uuid: string }>, res: Response, next: NextFunction)=>{
     const uuid = req.params.uuid;
     const modifiedUser = req.body;
     modifiedUser.uuid = uuid
-    res.status(StatusCodes.OK).send(modifiedUser)
+    await users.update(modifiedUser, {
+        where: {
+            id: uuid
+          }
+    })
+    .then(() =>{
+        return res.json({
+            erro: false,
+            mensagem: "Usuario atualizado com sucesso!"
+        })
+    }).catch(() =>{
+        return res.status(StatusCodes.NOT_FOUND).json({
+            erro: true,
+            mensagem: "Usuario não atualizado!"
+        })
+    })
 })
 
 
-usersRoute.delete('/users/:uuid', (req: Request<{ uuid: string }>, res: Response, next: NextFunction)=>{
+usersRoute.delete('/users/:uuid', async(req: Request<{ uuid: string }>, res: Response, next: NextFunction)=>{
     const uuid = req.params.uuid;
-    res.sendStatus(StatusCodes.OK)
+    await users.destroy({
+        where: {
+            id: uuid
+          }
+    })
+    .then(() =>{
+        return res.json({
+            erro: false,
+            mensagem: "Usuario deletado com sucesso!"
+        })
+    }).catch(() =>{
+        return res.status(StatusCodes.NOT_FOUND).json({
+            erro: true,
+            mensagem: "Usuario não deletado!"
+        })
+    })
 })
 
 
