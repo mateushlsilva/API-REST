@@ -13,13 +13,18 @@ usersRoute.get('/users', async(req: Request, res: Response, next: NextFunction)=
 
 usersRoute.get('/users/:uuid', async(req: Request<{ uuid: string }>, res: Response, next: NextFunction)=>{
     const uuid = req.params.uuid;
-    const project = await users.findOne({ where: { id: uuid } });
+    console.log("Tri");
+    
+    const project = await users.findOne({ where: { id: uuid } })
+    
     if (project === null) {
-        console.log('Not found!');
+        return res.status(StatusCodes.NOT_FOUND).json({
+            erro: true,
+            mensagem: "Usuario não cadastrado!"
+        })
     } else {
-    console.log(project instanceof users); // true
-    console.log(project.id); // 'My Title'
-}
+        return res.json(project)
+ }
     
 })
 
