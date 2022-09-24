@@ -1,5 +1,6 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { StatusCodes } from 'http-status-codes';
+import { Sequelize } from 'sequelize';
 
 const usersRoute = Router();
 const users = require('../models/userTable')
@@ -15,9 +16,21 @@ usersRoute.get('/users/:uuid', (req: Request<{ uuid: string }>, res: Response, n
     res.status(StatusCodes.OK).send({ uuid });
 })
 
-usersRoute.post('/users', (req: Request, res: Response, next: NextFunction)=>{
-    const newUser = req.body;
-    res.status(StatusCodes.CREATED).send(newUser)
+usersRoute.post('/users', async (req: Request, res: Response, next: NextFunction)=>{
+    console.log(req.body);
+    await users.create(req.body)
+    .then(() =>{
+        return res.json({
+            erro: false,
+            mensagem: "Usuario cadastrado com sucesso!"
+        })
+    }).catch(() =>{
+        return res.status(StatusCodes.NOT_FOUND).json({
+            erro: true,
+            mensagem: "Usuario não cadastrado com sucesso!"
+        })
+    })
+    res.status(StatusCodes.CREATED).send(req.body)
     
 })
 
