@@ -15,8 +15,15 @@ const users = database.define('users', {
         type: Sequelize.STRING,
         allowNull: false
     },
+    email: {
+        type: Sequelize.STRING,
+        allowNull: false
+    },
+    senha: {
+        type: Sequelize.STRING,
+        allowNull: false
+    }
 })
- 
 
 users.sync({ alter: true });
 
